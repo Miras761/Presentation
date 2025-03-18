@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Tree Presentation for 8th Grade by Miras</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Roboto', sans-serif; background: #0A0A0A; color: #E0E0E0; min-height: 100vh; overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #00FF7F; display: flex; justify-content: center; align-items: center; z-index: 2000; transition: opacity 1s ease; }
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        #loader h1 { font-family: 'Orbitron', sans-serif; font-size: 4rem; color: #000; text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .container { width: 90%; max-width: 1600px; margin: 0 auto; padding: clamp(1rem, 3vw, 2rem); flex: 1 0 auto; display: none; }
+        .container.active { display: block; }
+        #intro { text-align: center; padding: 2rem; background: rgba(0, 255, 127, 0.1); margin-bottom: 2rem; border-radius: 10px; box-shadow: 0 0 20px rgba(0, 255, 127, 0.3); }
+        #intro h1 { font-family: 'Orbitron', sans-serif; font-size: 3rem; color: #00FF7F; text-shadow: 0 0 15px rgba(0, 255, 127, 0.7); animation: fadeIn 2s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #description-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center; }
+        #description-modal.active { display: flex; }
+        #description-content { background: #121212; padding: clamp(1.5rem, 3vw, 2rem); border-radius: 10px; max-width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 20px rgba(0, 255, 127, 0.3); }
+        #close-modal { position: absolute; top: 1rem; right: 1rem; background: #FF4444; color: #FFF; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer; font-family: 'Orbitron', sans-serif; }
+        #close-modal:hover { background: #CC0000; }
+        section { margin: clamp(2.5rem, 5vw, 4rem) 0; padding: clamp(2.5rem, 5vw, 3.5rem); background: rgba(18, 18, 18, 0.9); border-left: clamp(5px, 1.5vw, 7px) solid #00FF7F; border-radius: 18px; box-shadow: 0 15px 40px rgba(0, 255, 127, 0.25); opacity: 0; transform: translateY(40px); animation: slideIn 0.8s ease forwards; }
+        section:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0, 255, 127, 0.35); }
+        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+        h2, h3 { font-family: 'Orbitron', sans-serif; background: linear-gradient(90deg, #00FF7F, #00CC66); -webkit-background-clip: text; color: transparent; text-shadow: 0 0 15px rgba(0, 255, 127, 0.7); margin-bottom: clamp(1.2rem, 3vw, 1.8rem); }
+        h2 { font-size: clamp(2rem, 5.5vw, 3rem); }
+        h3 { font-size: clamp(1.6rem, 4vw, 2.2rem); }
+        p, ul { margin-bottom: clamp(1.2rem, 3vw, 1.8rem); font-size: clamp(1.1rem, 2.5vw, 1.3rem); line-height: 2.2; color: #D0D0D0; text-shadow: 0 0 6px rgba(0, 255, 127, 0.25); }
+        ul { list-style-type: square; margin-left: 50px; }
+        .btn { background: linear-gradient(45deg, #00FF7F, #00CC66); color: #000; padding: clamp(0.7rem, 3vw, 1rem) clamp(1.5rem, 4.5vw, 2rem); font-family: 'Orbitron', sans-serif; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 6px 20px rgba(0, 255, 127, 0.6); transition: all 0.3s ease; font-size: clamp(1rem, 2.5vw, 1.2rem); margin: 5px; }
+        .btn:hover { background: linear-gradient(45deg, #00CC66, #00FF7F); transform: translateY(-5px); }
+        .btn:active { transform: scale(0.95); }
+        .game-area { text-align: center; margin: clamp(2rem, 4.5vw, 2.5rem) 0; }
+        .game-item { display: inline-block; width: clamp(80px, 13vw, 100px); height: clamp(80px, 13vw, 100px); background-color: #66bb6a; color: white; text-align: center; line-height: clamp(80px, 13vw, 100px); margin: 10px; cursor: pointer; border-radius: 50%; transition: transform 0.2s; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 8px rgba(0, 255, 127, 0.7); }
+        .game-item:hover { transform: scale(1.2); background: linear-gradient(45deg, #00FF7F, #00CC66); }
+        .game-item.collected { opacity: 0.5; pointer-events: none; }
+        .descriptor { font-style: italic; color: #A0A0A0; margin-top: 20px; font-size: clamp(1rem, 2.5vw, 1.2rem); line-height: 1.6; }
+        .image { max-width: 100%; height: auto; border: 4px solid #00FF7F; border-radius: 12px; margin: clamp(2rem, 3.5vw, 2.5rem) 0; box-shadow: 0 0 25px rgba(0, 255, 127, 0.6); }
+        footer { text-align: center; padding: clamp(2rem, 4vw, 2.5rem); background: rgba(0, 0, 0, 0.9); font-size: clamp(1rem, 1.5vw, 1.2rem); box-shadow: 0 -6px 30px rgba(0, 255, 127, 0.4); border-top: 2px solid rgba(0, 255, 127, 0.4); flex-shrink: 0; }
+        @media (max-width: 1024px) { section { padding: clamp(2rem, 4.5vw, 3rem); } .game-item { width: clamp(70px, 13vw, 90px); height: clamp(70px, 13vw, 90px); line-height: clamp(70px, 13vw, 90px); } }
+        @media (max-width: 768px) { .container { padding: clamp(1.2rem, 3vw, 2rem); } section { margin: clamp(2rem, 4.5vw, 3rem) 0; padding: clamp(1.5rem, 4vw, 2.5rem); } .game-item { width: clamp(60px, 13vw, 80px); height: clamp(60px, 13vw, 80px); line-height: clamp(60px, 13vw, 80px); margin: 8px; } .image { margin: clamp(1.5rem, 3vw, 2rem) 0; } }
+        @media (max-width: 480px) { h2 { font-size: clamp(1.8rem, 5.5vw, 2.5rem); } h3 { font-size: clamp(1.4rem, 4.5vw, 2rem); } p, ul { font-size: clamp(0.9rem, 2.5vw, 1.1rem); } .game-item { width: clamp(50px, 13vw, 70px); height: clamp(50px, 13vw, 70px); line-height: clamp(50px, 13vw, 70px); margin: 6px; } .image { margin: clamp(1.2rem, 2.5vw, 1.5rem) 0; } .descriptor { font-size: clamp(0.8rem, 2.5vw, 1rem); } }
+    </style>
+</head>
+<body>
+    <div id="loader">
+        <h1>Loading Presentation</h1>
+    </div>
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="container" id="main-content">
+        <div id="intro">
+            <h1>By Miras</h1>
+            <button class="btn" onclick="openDescription()">Show Description</button>
+        </div>
+
+        <div id="description-modal">
+            <div id="description-content">
+                <button id="close-modal" onclick="closeDescription()">Close</button>
+                <h2>Presentation Description</h2>
+                <p>This presentation, created by Miras for 8th-grade students, explores the fascinating world of trees. It covers tree parts and functions, the natural beauty of Yosemite National Park, and the importance of trees to our environment. Engage with interactive True/False challenges to test your knowledge and earn rewards! Below are detailed stories and answers for each section:</p>
+                <h3>1. Tree Parts and Functions</h3>
+                <p><strong>Answers:</strong> 
+                    - Roots - True (they anchor the tree deep into the earth, absorbing water and nutrients like silent workers beneath the soil, ensuring stability and nourishment). 
+                    - Trunk - False (it not only supports the tree but acts as a vital conduit, transporting water and nutrients from roots to leaves, with its bark protecting the inner life). 
+                    - Leaves - False (they take in carbon dioxide and release oxygen through photosynthesis, a magical process turning sunlight into life-giving air, not just oxygen intake). 
+                    - Branches - False (they sprout from various points along the trunk, stretching out like arms to support leaves and provide homes for birds). 
+                    <strong>Story:</strong> In the heart of a forest, trees stand as ancient guardians. Imagine a young oak, its roots digging deep into the earth, seeking water to fuel its growth. Its trunk, thick and sturdy, rises proudly, carrying life upward. Leaves shimmer in the sunlight, crafting oxygen as a gift to all living things, while branches sway, hosting nests and whispering secrets of the wild. Each part works in harmony, a symphony of nature that has thrived for centuries, teaching us resilience and balance.</p>
+                
+                <h3>2. A Carpet of Colour: Yosemite National Park</h3>
+                <p><strong>Answers:</strong> 
+                    - Yosemite - True (it lies majestically in California, USA, a sanctuary of natural wonders). 
+                    - Waterfalls - False (they roar to life in spring with melting snow, not just summer, creating a spectacle of mist and sound). 
+                    - Sequoias - False (they are the largest by volume, but coast redwoods claim the height title, standing like gentle giants). 
+                    - Wildlife - False (the forests teem with deer, bears, and birds, a lively chorus of nature’s inhabitants). 
+                    <strong>Story:</strong> Picture Yosemite National Park, a canvas of nature’s artistry in California, USA. In spring, waterfalls like Yosemite Falls cascade with the force of melted snow, their mist kissing the air. Towering sequoias, not the tallest but the mightiest by girth, stand as living history, some over 3,000 years old. Deer graze silently, bears roam, and birds sing, all thriving in this vibrant ecosystem, a testament to the park’s enduring beauty across seasons.</p>
+                
+                <h3>3. Importance of Trees</h3>
+                <p><strong>Answers:</strong> 
+                    - Trees provide oxygen - True (they produce oxygen via photosynthesis, a natural miracle sustaining life on Earth). 
+                    - Deforestation has no impact - False (it releases carbon, disrupts climate balance, and endangers ecosystems). 
+                    - Trees offer shelter only to birds - False (they house squirrels, insects, and countless creatures in their branches). 
+                    - Planting trees reduces pollution - True (they absorb pollutants, filtering the air we breathe). 
+                    <strong>Story:</strong> Trees are the lungs of our planet, standing tall as silent heroes. Imagine a forest where photosynthesis turns sunlight into oxygen, a gift for every breath we take. Yet, deforestation scars the land, releasing stored carbon and silencing wildlife homes—from squirrels to insects—while disrupting climate harmony. Planting new trees fights back, their leaves capturing pollutants, weaving a cleaner future, a legacy we must nurture for generations to come.</p>
+            </div>
+        </div>
+
+        <section id="slide1">
+            <h2>1. Tree Parts and Functions</h2>
+            <p>Explore the essential parts of a tree and their roles. Test your knowledge with True/False questions!</p>
+            <ul>
+                <li><strong>Roots</strong> anchor the tree and absorb water.</li>
+                <li><strong>Trunk</strong> is the central part that only supports the tree.</li>
+                <li><strong>Leaves</strong> help the tree breathe by taking in oxygen.</li>
+                <li><strong>Branches</strong> grow only from the top of the trunk.</li>
+            </ul>
+            <div class="game-area" id="game-area-1">
+                <h3>Tree True/False Challenge</h3>
+                <p>Click your answer for: <span id="current-question-1">Roots</span></p>
+                <div id="game1-true" class="game-item" onclick="checkAnswer(1, true)">True</div>
+                <div id="game1-false" class="game-item" onclick="checkAnswer(1, false)">False</div>
+                <p id="game1-result">Score: 0/4</p>
+            </div>
+            <p class="descriptor">(Check "Show Description" for answers and stories!)</p>
+            <img src="tree_diagram.jpg" alt="Tree Diagram" class="image">
+        </section>
+
+        <section id="slide2">
+            <h2>2. A Carpet of Colour: Yosemite National Park</h2>
+            <p>Discover the beauty of Yosemite. Test your understanding with True/False questions!</p>
+            <ul>
+                <li><strong>Yosemite</strong> is located in the United States.</li>
+                <li><strong>Waterfalls</strong> in Yosemite flow only in summer.</li>
+                <li><strong>Sequoias</strong> are the tallest trees in the park.</li>
+                <li><strong>Wildlife</strong> is absent in Yosemite’s forests.</li>
+            </ul>
+            <div class="game-area" id="game-area-2">
+                <h3>Yosemite True/False Quiz</h3>
+                <p>Click your answer for: <span id="current-question-2">Yosemite</span></p>
+                <div id="game2-true" class="game-item" onclick="checkAnswer(2, true)">True</div>
+                <div id="game2-false" class="game-item" onclick="checkAnswer(2, false)">False</div>
+                <p id="game2-result">Score: 0/4</p>
+            </div>
+            <p class="descriptor">(Check "Show Description" for answers and stories!)</p>
+            <img src="yosemite_park.jpg" alt="Yosemite National Park" class="image">
+        </section>
+
+        <section id="slide3">
+            <h2>3. Importance of Trees</h2>
+            <p>Understand why trees matter. Test yourself with True/False questions!</p>
+            <ul>
+                <li><strong>Trees</strong> provide oxygen for humans to breathe.</li>
+                <li><strong>Deforestation</strong> has no impact on climate.</li>
+                <li><strong>Trees</strong> offer shelter only to birds.</li>
+                <li><strong>Planting trees</strong> can help reduce pollution.</li>
+            </ul>
+            <div class="game-area" id="game-area-3">
+                <h3>Tree Importance True/False Game</h3>
+                <p>Click your answer for: <span id="current-question-3">Trees provide oxygen</span></p>
+                <div id="game3-true" class="game-item" onclick="checkAnswer(3, true)">True</div>
+                <div id="game3-false" class="game-item" onclick="checkAnswer(3, false)">False</div>
+                <p id="game3-result">Score: 0/4</p>
+            </div>
+            <p class="descriptor">(Check "Show Description" for answers and stories!)</p>
+        </section>
+    </div>
+
+    <footer>
+        <p>© 2025 Miras | 8th Grade Presentation</p>
+    </footer>
+
+    <script>
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            const container = document.getElementById('main-content');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                container.classList.add('active');
+            }, 2000);
+        });
+
+        const particleCanvas = document.getElementById('particles-canvas');
+        const particleCtx = particleCanvas.getContext('2d');
+        particleCanvas.width = window.innerWidth;
+        particleCanvas.height = window.innerHeight;
+        let particlesArray = [];
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * particleCanvas.width;
+                this.y = Math.random() * particleCanvas.height;
+                this.size = Math.random() * 6 + 1;
+                this.speedX = (Math.random() * 1.2 - 0.6);
+                this.speedY = (Math.random() * 1.2 - 0.6);
+                this.opacity = Math.random() * 0.6 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > particleCanvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > particleCanvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                particleCtx.fillStyle = `rgba(0, 255, 127, ${this.opacity})`;
+                particleCtx.beginPath();
+                particleCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                particleCtx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            for (let i = 0; i < 200; i++) particlesArray.push(new Particle());
+        }
+
+        function animateParticles() {
+            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            particlesArray.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+            initParticles();
+        });
+
+        initParticles();
+        animateParticles();
+
+        let scores = { 1: 0, 2: 0, 3: 0 };
+        let currentQuestions = { 1: 0, 2: 0, 3: 0 };
+        const questions = {
+            1: ['Roots', 'Trunk', 'Leaves', 'Branches'],
+            2: ['Yosemite', 'Waterfalls', 'Sequoias', 'Wildlife'],
+            3: ['Trees provide oxygen', 'Deforestation has no impact', 'Trees offer shelter only to birds', 'Planting trees reduces pollution']
+        };
+        const answers = {
+            1: [true, false, false, false],
+            2: [true, false, false, false],
+            3: [true, false, false, true]
+        };
+
+        function checkAnswer(section, answer) {
+            const currentQuestion = currentQuestions[section];
+            const correctAnswer = answers[section][currentQuestion];
+            const gameArea = document.getElementById(`game-area-${section}`);
+            const result = document.getElementById(`game${section}-result`);
+            const currentQuestionElement = document.getElementById(`current-question-${section}`);
+
+            if (!document.getElementById(`game${section}-true`).classList.contains('collected') && !document.getElementById(`game${section}-false`).classList.contains('collected')) {
+                if (answer === correctAnswer) {
+                    if (answer) document.getElementById(`game${section}-true`).classList.add('collected');
+                    else document.getElementById(`game${section}-false`).classList.add('collected');
+                    scores[section]++;
+                    result.innerText = `Score: ${scores[section]}/4`;
+
+                    if (scores[section] < 4) {
+                        currentQuestions[section]++;
+                        currentQuestionElement.innerText = questions[section][currentQuestions[section]];
+                        document.getElementById(`game${section}-true`).classList.remove('collected');
+                        document.getElementById(`game${section}-false`).classList.remove('collected');
+                    } else {
+                        if (section === 1) alert('Awesome! You aced the Tree Challenge! +10 points!');
+                        else if (section === 2) alert('Great job! Fun fact: Some Yosemite sequoias are over 3,000 years old!');
+                        else if (section === 3) alert('Congratulations! You earned the Eco-Warrior Badge!');
+                    }
+                } else {
+                    alert('Oops! Try again! Check "Show Description" for help.');
+                }
+            }
+        }
+
+        function openDescription() {
+            document.getElementById('description-modal').classList.add('active');
+        }
+
+        function closeDescription() {
+            document.getElementById('description-modal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
