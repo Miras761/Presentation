@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Жылу реттеудегі тері</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0f0d;
+            color: #d4edda;
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+        }
+        h1 {
+            color: #28a745;
+            font-size: 2em;
+        }
+        section {
+            background: #1b3027;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            max-width: 100%;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 8px 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .match-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        .match-column {
+            background: #2e4a3d;
+            padding: 10px;
+            border-radius: 5px;
+            min-width: 120px;
+            flex: 1;
+        }
+        .match-item {
+            padding: 5px;
+            background: #28a745;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        .matched {
+            background: #17a2b8;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ЖЫЛУ РЕТТЕУДЕГІ ТЕРІ</h1>
+
+    <section>
+        <h2>Кіріспе</h2>
+        <p>Тері – адам ағзасының ең үлкен мүшесі. Ол жылу реттеу, қорғаныс және сезімталдық функцияларын атқарады.</p>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Human_skin_diagram.jpg/600px-Human_skin_diagram.jpg" alt="Тері құрылымы">
+    </section>
+
+    <section>
+        <h2>Дескриптор</h2>
+        <p><strong>1. Тері ауданы 2 м² ме?</strong></p>
+        <p>Иә, адам терісінің жалпы ауданы шамамен 1.5–2 м² болады. Бұл оның денені толық жабатын үлкен орган екенін көрсетеді.</p>
+
+        <p><strong>2. Тері 6 айда жаңара ма?</strong></p>
+        <p>Жоқ, терінің жоғарғы қабаты (эпидермис) шамамен 28 күнде толық жаңарады. Ескі жасушалар түсіп, орнына жаңалары келеді.</p>
+
+        <p><strong>3. Терлеу мен меланиннің рөлі қандай?</strong></p>
+        <p>Терлеу дененің салқындауына көмектеседі. Ал меланин – терінің түсін анықтайтын пигмент, ол ультракүлгін сәулелерден қорғайды.</p>
+    </section>
+
+    <section>
+        <h2>Дұрыс/Бұрыс</h2>
+        <p>1. Тері ауданы 2 м² ме? <button onclick="checkQuiz(true)">Иә</button><button onclick="checkQuiz(false)">Жоқ</button></p>
+        <p>2. Тері 6 айда жаңара ма? <button onclick="checkQuiz(false)">Иә</button><button onclick="checkQuiz(true)">Жоқ</button></p>
+    </section>
+
+    <section>
+        <h2>Сәйкестендіру</h2>
+        <div class="match-container">
+            <div class="match-column">
+                <div class="match-item" onclick="selectItem(this, 'Терлеу')">Терлеу</div>
+                <div class="match-item" onclick="selectItem(this, 'Меланин')">Меланин</div>
+            </div>
+            <div class="match-column">
+                <div class="match-item" onclick="selectItem(this, 'Салқындату')">Салқындату</div>
+                <div class="match-item" onclick="selectItem(this, 'Түс')">Түс</div>
+            </div>
+        </div>
+        <p id="matchAnswer"></p>
+    </section>
+
+    <section>
+        <h2>Қосымша материалдар</h2>
+        <p>Толық ақпарат алу үшін төмендегі сілтемеге өтіңіз:</p>
+        <a href="https://kk.wikipedia.org/wiki/Тері" target="_blank">Тері туралы Wikipedia мақаласы</a>
+        <br><br>
+        <button onclick="window.location.href='https://kk.wikipedia.org/wiki/Тері'">Толық оқу</button>
+    </section>
+
+    <section>
+        <h2>Қорытынды</h2>
+        <p>Тері – ағзаның маңызды бөлігі. Ол жылу реттеуге, қорғанысқа және сезімталдыққа жауап береді. Денсаулығыңызды сақтау үшін тері күтіміне мән беріңіз!</p>
+    </section>
+
+    <script>
+        function checkQuiz(correct) {
+            alert(correct ? "Дұрыс!" : "Қате!");
+        }
+
+        let term = null, desc = null;
+
+        function selectItem(item, value) {
+            if (!item.classList.contains("matched")) {
+                if (!term) {
+                    term = item;
+                } else {
+                    desc = item;
+                    if (
+                        (term.innerText === "Терлеу" && desc.innerText === "Салқындату") ||
+                        (term.innerText === "Меланин" && desc.innerText === "Түс")
+                    ) {
+                        term.classList.add("matched");
+                        desc.classList.add("matched");
+                    }
+                    term = null;
+                    desc = null;
+                }
+            }
+
+            let matchAnswer = document.getElementById("matchAnswer");
+            matchAnswer.innerText = "Дұрыс жұптар: Терлеу - Салқындату, Меланин - Түс.";
+        }
+    </script>
+
+</body>
+</html>
